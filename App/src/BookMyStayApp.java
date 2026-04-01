@@ -1,8 +1,10 @@
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * BookMyStayApp - Entry point of the Hotel Booking Management System
- * Demonstrates Room Types, Inventory, and Search Functionality
+ * Demonstrates Room Types, Inventory, Search, and Booking Requests
  *
  * @author Yato
  * @version 1.0
@@ -46,7 +48,7 @@ class SuiteRoom extends Room {
     }
 }
 
-// 🔹 UC3: Inventory Class
+// 🔹 UC3: Inventory
 class RoomInventory {
 
     private HashMap<String, Integer> availability;
@@ -85,12 +87,51 @@ class SearchService {
 
             int available = inventory.getAvailability(room.type);
 
-            // ✅ Only show if available > 0
             if (available > 0) {
                 room.displayDetails();
                 System.out.println("Available: " + available);
                 System.out.println("-----------------------");
             }
+        }
+    }
+}
+
+// 🔹 UC5: Reservation Class
+class Reservation {
+    String guestName;
+    String roomType;
+
+    Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
+        this.roomType = roomType;
+    }
+
+    void display() {
+        System.out.println("Guest: " + guestName + " | Requested: " + roomType);
+    }
+}
+
+// 🔹 UC5: Booking Queue
+class BookingQueue {
+
+    private Queue<Reservation> queue;
+
+    BookingQueue() {
+        queue = new LinkedList<>();
+    }
+
+    // Add request
+    void addRequest(Reservation r) {
+        queue.add(r);
+        System.out.println("Request added for " + r.guestName);
+    }
+
+    // Display all requests (FIFO order)
+    void showQueue() {
+        System.out.println("\n===== Booking Requests (FIFO Order) =====");
+
+        for (Reservation r : queue) {
+            r.display();
         }
     }
 }
@@ -116,8 +157,17 @@ public class BookMyStayApp {
         // 🔹 UC3: Inventory
         RoomInventory inventory = new RoomInventory();
 
-        // 🔹 UC4: Search (READ ONLY)
+        // 🔹 UC4: Search
         SearchService search = new SearchService();
         search.searchAvailableRooms(rooms, inventory);
+
+        // 🔹 UC5: Booking Requests
+        BookingQueue bookingQueue = new BookingQueue();
+
+        bookingQueue.addRequest(new Reservation("Alice", "Single Room"));
+        bookingQueue.addRequest(new Reservation("Bob", "Double Room"));
+        bookingQueue.addRequest(new Reservation("Charlie", "Suite Room"));
+
+        bookingQueue.showQueue();
     }
 }
