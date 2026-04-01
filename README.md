@@ -1,1 +1,1 @@
-# PalindromeCheckerApp
+# BookMyStayApp
