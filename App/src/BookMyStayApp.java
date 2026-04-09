@@ -2,7 +2,7 @@ import java.util.*;
 
 /**
  * BookMyStayApp - Entry point of the Hotel Booking Management System
- * Demonstrates Rooms, Inventory, Booking, Allocation, and Add-On Services
+ * Demonstrates Booking System with History & Reporting
  *
  * @author Yato
  * @version 1.0
@@ -85,7 +85,7 @@ class SearchService {
     }
 }
 
-// 🔹 UC5: Reservation
+// 🔹 Reservation
 class Reservation {
     String guestName;
     String roomType;
@@ -122,7 +122,6 @@ class BookingService {
     private HashMap<String, Set<String>> allocations = new HashMap<>();
     private int counter = 1;
 
-    // store reservationId mapping
     private List<Reservation> confirmedReservations = new ArrayList<>();
 
     List<Reservation> getConfirmedReservations() {
@@ -152,7 +151,6 @@ class BookingService {
 
                     inventory.reduceAvailability(r.roomType);
 
-                    // assign reservation ID
                     r.reservationId = "RES" + counter;
 
                     confirmedReservations.add(r);
@@ -214,6 +212,39 @@ class AddOnServiceManager {
     }
 }
 
+// 🔹 UC8: Booking History
+class BookingHistory {
+
+    private List<Reservation> history = new ArrayList<>();
+
+    void addReservation(Reservation r) {
+        history.add(r);
+    }
+
+    List<Reservation> getAll() {
+        return history;
+    }
+}
+
+// 🔹 UC8: Report Service
+class ReportService {
+
+    void showAllBookings(List<Reservation> history) {
+        System.out.println("\n===== Booking History =====");
+
+        for (Reservation r : history) {
+            System.out.println("Reservation ID: " + r.reservationId +
+                    " | Guest: " + r.guestName +
+                    " | Room: " + r.roomType);
+        }
+    }
+
+    void summary(List<Reservation> history) {
+        System.out.println("\n===== Booking Summary =====");
+        System.out.println("Total Bookings: " + history.size());
+    }
+}
+
 // 🔹 Main Class
 public class BookMyStayApp {
 
@@ -251,17 +282,23 @@ public class BookMyStayApp {
 
         // UC7
         AddOnServiceManager manager = new AddOnServiceManager();
-
         List<Reservation> confirmed = bookingService.getConfirmedReservations();
 
         if (!confirmed.isEmpty()) {
-
             Reservation r = confirmed.get(0);
-
             manager.addService(r.reservationId, new AddOnService("Breakfast", 200));
             manager.addService(r.reservationId, new AddOnService("Spa", 500));
-
             manager.showServices(r.reservationId);
         }
+
+        // UC8
+        BookingHistory history = new BookingHistory();
+        for (Reservation r : confirmed) {
+            history.addReservation(r);
+        }
+
+        ReportService report = new ReportService();
+        report.showAllBookings(history.getAll());
+        report.summary(history.getAll());
     }
 }
